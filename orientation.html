@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wowee!</title>
+<script>
+MathJax = {
+  loader: {load: ['[tex]/physics', 'output/chtml']},
+  tex: {
+    packages: {'[+]': ['physics']},
+    inlineMath: [['\\(', '\\)']],
+    macros: {
+      norm: ['\\left\\lVert#1\\right\\rVert', 1]
+    }
+  },
+  // svg: {
+  //   fontCache: 'global'
+  // }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+</head>
+<body>
+<h1>Primer on orientation</h1>
+<p>
+    An orientation of a geometric space is a way of assigning a consistent
+    "handedness" to the space. That's a little vague, so it demands some elaboration.
+</p>
+<p>
+    The concept of orientation arises from the observation that some objects
+    are different from their mirror images, in the sense that after you mirror the
+    object, there's no way to rotate or translate it so that the mirror image overlaps
+    with the original. The classic example of this is the left hand as compared
+    to the right, which is why orientation is often called handedness, or chirality
+    ('handedness' in Greek-ish English).
+</p>
+<p>
+    It turns out that in ordinary Euclidean space, regardless of how many dimensions
+    you're working in, there's only two distinct orientations. The formal fact
+    corresponding to this intuitive fact is that the isometry group of Euclidean space
+    has two connected components — if you restrict your attention to linear isometries,
+    these will be the isometries with determinant 1 (which perserve orientation) and
+    those with determinant -1 (which reverse orientation). There is a continuous path
+    between any two isometries that preserve orientation, and between any two that
+    reverse it, but there's no continuous way to go from an isometry that preserves
+    orientation to one that reverses it, without passing through non-isometries.
+</p>
+<p>
+    As far as I know, that there are only two orientations is true in general spaces
+    and not just Euclidean ones, but as
+    the geometric interpretation of our space becomes more obscure, so does the geometric
+    meaning of orientation.
+</p>
+<p>
+    On differentiable manifolds, an orientation can be thought of as a global section of
+    the orientation bundle.
+</p>
+<h2>Manifold, bundle, section, orientation</h2>
+<p>
+    I assume you know what vector spaces, bases, equivalence classes, \(\mathbb{R}^n\) and
+    continuity are.
+</p>
+<p>
+    For a finite dimensional vector space, we say that two bases have equal orientation
+    when the linear map sending one to the other has positive determinant. This splits
+    the collection of all bases into two equivalence classes, and each of these equivalence
+    classes is an orientation of V.
+
+    (Alternatively, an orientation of V is a choice of which equivalence class is positive,
+    which is not precisely the same thing.)
+</p>
+<p>
+    For an example, consider \(\mathbb{R}^2\) with basis vectors \(i,j\). If the shorter
+    path for rotating \(i\) to align with \(j\) goes counterclockwise, then the basis is
+    positively oriented (by convention). Otherwise the basis is negatively oriented.
+</p>
+</body>
+</html>

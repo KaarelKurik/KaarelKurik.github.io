@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+<title>Wowee!</title>
+<script>
+MathJax = {
+  loader: {load: ['[tex]/physics', 'output/chtml']},
+  tex: {
+    packages: {'[+]': ['physics']},
+    inlineMath: [['\\(', '\\)']],
+    macros: {
+      norm: ['\\left\\lVert#1\\right\\rVert', 1]
+    }
+  },
+  // svg: {
+  //   fontCache: 'global'
+  // }
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+</head>
+<body>
+    <h1>On wormholes with funny shapes</h1>
+    <img src="images/wormholes.png">
+    <p>
+      That's an image of two donut-shaped wormholes connected to each other. But
+      what does that mean, exactly - and how did I cajole a computer into making an image
+      of such a thing?
+    </p>
+    <h2>Mathematical background</h2>
+    <p>
+      To get a clear idea of what's happening here, it's necessary to be familiar with the mathematical technology involved.
+      Aside from tools used in all fields of mathematics, our tech falls under the subject of <i>differential geometry.</i>
+      The specific constructs we'll need are
+      <ul>
+        <li>manifolds and smooth structures on them,</li>
+        <li>manifolds with boundary,</li>
+        <li>Riemannian manifolds and inverse metrics on them,</li>
+        <li>tensors and tensor calculus,</li>
+        <li>gluing, i.e. quotient spaces,</li>
+        <li>partitions of unity,</li>
+        <li>pushforwards and pullbacks.</li>
+      </ul>
+
+      I will attempt to present an intuitive picture of how a wormhole is built, and a formal picture. The intuitive
+      picture should be possible to understand without a complete background in the relevant tools, but some amount
+      of misunderstanding is likely without such a background.
+    </p>
+
+    <h2>The intuitive picture: toward a wormhole</h2>
+    <p>
+      The broad idea of a wormhole is that of a tunnel between two spaces. To make one, you cut similar holes
+      out of each space, and glue the edges of the holes to each other. This sounds simple enough, but you
+      will rapidly run into trouble if you try to do this naively.
+    </p>
+    <p>
+      Suppose our two spaces are each just a copy of 3D space, and the hole we cut is a ball of unit radius.
+      To glue the boundary of one hole to the other, we send each point to the one with the same coordinates
+      in the other copy. Is that good enough?
+    </p>
+    <p>
+      Almost. The resulting space will have a smooth structure, but in some sense it won't be compatible
+      with the metric of each of the two 3D spaces. If we take a point on the boundary of the hole
+      and shoot a ray tangentially along the hole, there won't be a consistent way to answer which
+      side of the hole it ends up on.
+    </p>
+    <p>
+      Another way to think of the issue is that finite segments of light rays should change smoothly
+      as the initial direction of the ray does. If I shoot a finite ray that just grazes the hole
+      and terminates somewhere, then any small rotation of my initial aim should move the termination
+      point only a little. But a small rotation from a grazing ray will ensure the ray continues
+      on one side of the hole, and the opposite rotation ensures it continues on the opposite side.
+      In either case, the ray will be proceeding away from the hole at the same speed, so the separation
+      between the endpoints can't be much less than some constant times the total length of the ray,
+      regardless of how small the rotation was. This means that rotating our aim results in a discontinuous
+      jump in the endpoint of our ray, so light rays don't behave correctly in our glued space.
+    </p>
+    <p>
+      This isn't a huge problem for making images, since rays are unlikely to hit the edge of a wormhole
+      anyway, but the image will be discontinuous and you'll run into other problems - for example, for
+      any physical body that partly hits the hole, the derivative of its internal forces will be discontinuous.
+    </p>
+    <p>
+      So if we want to glue two spaces together, we need to glue a bit more than just their boundaries -
+      we need some overlap, so we can gradually transition from the geometry of one space to that of the other. To accomplish this,
+      we pick a neighborhood of the boundary for each space, and we glue those together. What does this look
+      like in practice?
+    </p>
+    <p>
+      Let's return again to the example of two 3D spaces with holes in the shape of unit balls.
+      Let's call one space \(A\) and the other \(B\). In \(A\), we'll consider the shell
+      of points around the hole whose distance from the origin is in the segment \([1,2]\),
+      and we'll glue this to the analogous shell in \(B\) by <i>reversing</i> each segment.
+      The exact function used to reverse a segment is not terribly important — one option
+      is to send a point \(p\) at distance \(r\) from the origin to a point at distance
+      \(3-r\) that lies along the same ray from the origin.
+    </p>
+    <p>
+      Take a moment to imagine a point in \(A\) falling into the shell around the hole. As
+      soon as it hits distance \(2\) from the origin, its mirror image appears in \(B\) at
+      distance \(1\). As the point sinks further into the shell in \(A\), its image in \(B\)
+      starts coming up and out of the shell. Once the point has hit the hole at radius \(1\)
+      in \(A\), its image in \(B\) is at distance \(2\) from the origin. Then the point
+      disappears in \(A\), and exits the shell in \(B\).
+    </p>
+    <p>
+      It's important to understand that after the gluing has been performed, the two shells
+      in \(A\) and \(B\) are just two different maps of the same underlying territory. When
+      we have a point in the shell in \(A\), its image in \(B\) is <i>really</i> the exact
+      same point, just viewed from a different angle. If you've ever looked in an atlas
+      of the Earth, different maps will have some amount of overlap, and you could spot
+      the same city on two different maps — same thing here.
+    </p>
+    <p>
+      If we perform the gluing in the way I've described, something unfortunate will happen.
+      If we have a left hand in \(A\), it falls into the hole and passes into \(B\), it will
+      become a right hand.
+    </p>
+    <p>
+      If the spaces \(A\) and \(B\) are not connected in any way other than through this wormhole,
+      this is a silly thing to worry about, because we could always mirror our perspective on \(B\)
+      and the hole will seem to preserve handedness. If we're connecting a space to itself
+      with a wormhole, then this becomes a meaningful problem: if we have two left hands
+      next to each other, and one goes off and does a round trip through a wormhole, it will
+      return as a right hand <i>as compared to</i> the left hand that stood still. When
+      \(A\) and \(B\) have no connections other than one wormhole, no such roundtrip is possible,
+      so no such comparison can be made, and the issue of reversing handedness is sort of fictitious.
+    </p>
+    <p>
+      To clarify the issue a little more, suppose we've chosen an orientation for each of \(A\)
+      and \(B\). What that means is, if I have some object in \(A\) whose mirror image
+      cannot be moved and rotated to overlap with the original, then choosing an orientation
+      means choosing either the object or its mirror to be the "right-handed" one
+      and letting the other be "left-handed". A simple example of an object like this in 3D
+      is a collection of 3 arrows coming out of a common point that have unique colors. A similar
+      object works in any number of dimensions, as long as the whole space is orientable.
+      (If a space is not orientable, that means that no object can be reliably distinguished from
+      its mirror image. For example, on the Möbius strip, a roundtrip around the strip will flip
+      any object to its mirror image.)
+    </p>
+
+    <h3>Manifolds and charts</h3>
+    <p><b>Basic examples:</b> \(n\)-dimensional real space \(\mathbb{R}^n\), \(n\)-dimensional sphere \(S^n = \{x \in \mathbb{R}^{n+1} \mid \norm{x} = 1\}\)</p>
+    <p>
+      A manifold is a geometric space that "locally looks like" \(n\)-dimensional real space, and has some additional properties to make sure
+      it's well-behaved. What does it mean to "locally look like" \(n\)-dimensional real space?
+
+
+    </p>
+    <h2>The construction itself</h2>
+    <p>
+      First off, for pairs of real numbers \(0 &lt; r &lt; R\), we'll define \(T(R,r)\) to be the torus with major radius \(R\) and minor radius \(r\),
+      sitting at the origin of \(\mathbb{R}^3\) and whose axis of symmetry is the \(z\)-axis.
+      For triples of real numbers \(0 &lt; r_1 &lt; r_2 &lt; R\), we define \(S(R,r_1,r_2)\) as the closed region bounded between the two tori
+      \(T(R, r_1)\) and \(T(R, r_2)\). We'll occasionally call this a <i>(toroidal) shell</i>.
+    </p>
+    <p>
+      For utility, we define \(\pi_{xy}\) to be the projection of a point onto the \(xy\)-plane.
+    </p>
+    <p>
+      It's possible to parameterize \(T(R,r)\) in the form \(R(\cos(\phi), \sin(\phi), 0) + r(\cos(\psi)\cos(\phi), \cos(\psi)\sin(\phi), \sin(\psi))\)
+      for two angles \(\phi, \psi\). Given a point \(x \in T(R,r)\), the component \(R(\cos(\phi), \sin(\phi), 0)\) is equal to
+      \(R\frac{\pi_{xy} x}{\norm{\pi_{xy} x}}\). We define \(c(x)\) to equal this component, and \(\delta(x) = x - c(x)\).
+    </p>
+    <p>
+      We can think of \(S(R,r_1,r_2)\) as a version of the product space \(T(R,r_1) \times [0,1]\).
+      Given a point \(x \in T(R,r_1)\), the fibre attached to \(x\) consists of points of the form \(c(x) + (1-\lambda)\delta(x) + \lambda \frac{r_2}{r_1} \delta(x)\)
+      for \(\lambda \in [0,1]\).
+    </p>
+</body>
+</html>

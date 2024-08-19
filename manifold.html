@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wowee!</title>
+<script>
+MathJax = {
+  loader: {load: ['[tex]/physics', 'output/chtml']},
+  tex: {
+    packages: {'[+]': ['physics']},
+    inlineMath: [['\\(', '\\)']],
+    macros: {
+      norm: ['\\left\\lVert#1\\right\\rVert', 1]
+    }
+  },
+};
+</script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+</head>
+<body>
+<h1>Primer on manifolds</h1>
+<h2>Prerequisites</h2>
+<p>
+    A basic understanding of sets, logic and functions. Some
+    familiarity with \(\mathbb{R}^n\) and multivariable calculus.
+    Willingness to meditate on a sentence for half an hour.
+</p>
+<h2>Topology</h2>
+<p>
+    A topological space is a set \(X\) along with a distinguished
+    collection of subsets \(O \subseteq 2^X\) called <i>open sets</i>.
+    \(O\) has to satisfy some conditions:
+    <ol>
+        <li>\(\forall x,y \in O. x \cap y \in O\),</li>
+        <li>\(\forall Q \subseteq O. \bigcup_{q \in Q} q \in O\),</li>
+        <li>\(\varnothing, X \in O\).</li>
+    </ol>
+    Members of \(X\) are called <i>points</i>. If a point \(x \in X\)
+    is a member of the open set \(O \subseteq X\), then \(O\) is said
+    to be an open neighborhood of \(x\). Authors differ in what
+    they mean by "neighborhood" without the word "open"
+    — some require a neighborhood of \(x\)
+    to be an open neighborhood, others say a neighborhood
+    of \(x\) is any set \(N \subseteq X\) which contains an open neighborhood of \(x\)
+    as a subset. Everybody agrees on the meaning of "open neighborhood" though.
+</p>
+<p>
+    An open set in a topological space should be understood as a grouping of "nearby"
+    points, in a very loose sense of "nearby". One important aspect of this is that
+    in nice topological spaces, it's possible to pick out a point by specifying all
+    of the open sets it belongs to. If the topology doesn't allow for this to be done,
+    then the topology is (intuitively) too coarse — it doesn't make distinctions finely
+    enough to pick out a particular point.
+</p>
+<p>
+    Another aspect of open sets is that while they don't always give us a way of saying
+    when two points are close together in an absolute sense, they let us talk about a
+    process that <i>approaches</i> a particular point. If we have a point \(x\),
+    and our process "eventually" enters every open set containing \(x\) and never
+    exits, then our process approaches \(x\) in the limit.
+    Relatedly, topologies let us talk about continuity and continuous functions. Given topological spaces \(X,Y\),
+    a function \(f \colon X \to Y\) is continuous precisely when for every open set \(O \subseteq Y\),
+    we have \(f^{-1}(O)\) is open in \(X\).
+</p>
+<p>
+    As long as \(X\) has more than one element, it can be turned into a topological
+    space in more than one way, since there is more than one collection of subsets
+    of \(X\) which satisfies the above conditions. The choice \(O = \{\varnothing, X\}\)
+    gives the <i>trivial topology</i> on \(X\), while \(O = 2^X\) gives the
+    <i>discrete topology</i>. A particular choice of open sets is called <i>a topology on</i> \(X\),
+    since it can be thought of as an extra structure layered onto \(X\).
+</p>
+<p>
+    It's possible for one topology to be smaller than another: when we have two topologies
+    \(O\) and \(O'\) on \(X\) (here \(O\) and \(O'\) are possibly distinct collections of open sets),
+    then if \(O \subseteq O'\), we say that \(O\) is <i>smaller</i> or that \(O\) is <i>coarser</i>.
+    Equivalently, we say that \(O'\) is <i>larger</i> or <i>finer</i>. In such a case, \(O'\) is more
+    demanding of limits — when \(O\) says that a process converges to a limit, \(O'\) might say
+    that the process is going nowhere in particular. As an example, from the point of view of the
+    trivial topology, which is the coarset of all, every process converges to every point. In the
+    opinion of the discrete topology, which is the finest, only those processes that eventually
+    stand perfectly still at a single point will converge to anything. Relatedly, if we have
+    a continuous function, making its domain coarser or its codomain finer might make
+    the function discontinuous.
+</p>
+<p>
+    If you have a family of topologies \(O_i \subseteq 2^X, i \in I\) on the set \(X\), then \(\bigcap_{i \in I} O_i\)
+    is also a topology on \(X\). This lets you take any \(S \subseteq 2^X\) and use it to <i>generate</i> a topology
+    by taking the intersections of all topologies containing \(S\). (There's always at least one topology containing
+    \(S\), since the discrete topology contains \(S\).) 
+</p>
+<p>
+    Given some topology \(O\) for \(X\), a <i>base</i> for \(O\) is a subset \(O'\) of \(O\) such that
+    every element of \(O\) is a union of some sets in \(O'\). Given any set \(S \subseteq 2^X\),
+    the set of all finite intersections of elements of \(S\) is a base for the topology generated by \(S\).
+</p>
+<p>
+    A classic example of a topological space is \(\mathbb{R}^n\) with the topology generated by all open balls around
+    each point.
+</p>
+<p>
+    Given a topological space \(X\), a <i>subspace of X</i> is a topological space \(S\), whose set
+    of points is a subset of the points of \(X\), and every open set \(O'\) of \(S\) can be written
+    in the form \(O' = O \cap X\) for some open set \(O\) of \(X\). As an example, the subspace topology
+    on a plane in 3D space is the same as the ordinary topology on a 2D plane.
+</p>
+<p>
+    If we have a continuous bijection \(f \colon X \to Y\) between the topolgical spaces \(X,Y\), and
+    its inverse is also continuous, then \(f\) is called a <i>homeomorphism</i>, and the spaces
+    \(X,Y\) are said to be <i>homeomorphic</i> (to one another). The relation of being homeomorphic
+    is an equivalence relation on topological spaces. From the perspective of topology alone,
+    homeomorphic spaces are indistinguishable.
+</p>
+<h2>Some nice properties that topological spaces can have</h2>
+<p>
+    A topological space \(X\) is called a <i>Hausdorff space</i> (after the mathematician Felix Hausdorff),
+    or a \(T_2\) space, when for any pair of points \(x, x' \in X\), there are <b>disjoint</b>
+    open sets \(O, O' \subseteq X\) such that \(x \in O, x' \in O'\). Another way to put this is that
+    every pair of points in \(X\) is <i>separated by open sets</i>.
+</p>
+<p>
+    A topological space \(X\) is called <i>second-countable</i> when its topology has a countable base.
+    (Classically) equivalently, it's second-countable when its topology is generated by a countable
+    family of subsets of \(X\).
+</p>
+<p>
+    With the usual topology, \(\mathbb{R}^n\) is Hausdorff and second-countable.
+</p>
+<p>
+    The property of being Hausdorff is important since it's equivalent to saying that limits are unique
+    when they exist — if my process approaches the points \(a,b\), then I must have \(a=b\).
+    Second-countability has to do with limiting the size of the space,
+    and is one of the conditions necessary for a space \(X\) to be <i>metrizable</i>, which is when
+    the topology on the space is generated by the open balls of a metric, i.e. sets of
+    the form \(\{y \in X \mid d(x,y) < r\}\) where \(r\) is a real number, \(x \in X\) and
+    \(d\) is a metric on \(X\), i.e. a function which measures a generalized kind of distance
+    between pairs of points in \(X\).
+</p>
+<h2>Manifolds</h2>
+<p>
+    A <i>manifold</i> is a second-countable Hausdorff space that is locally homeomorphic
+    to \(\mathbb{R}^n\) for some \(n\). Being locally homeomorphic to \(\mathbb{R}^n\) means
+    that every point in the space has some open neighborhood which is homeomorphic to
+    \(\mathbb{R}^n\) when said neighborhood is given the subspace topology.
+</p>
+<p>
+    A classic example of a manifold is the sphere, i.e. the outer layer of a 3D ball.
+    It's a 2-manifold, i.e. a manifold that is locally homeomorphic to \(\mathbb{R}^2\).
+    Of course, each \(\mathbb{R}^n\) is itself an n-manifold.
+</p>
+<p>
+    A more complicated example of a manifold is the collection of all lines through zero
+    in \(\mathbb{R}^3\), with the distance between two lines being the smaller angle
+    between them. This space is called the <i>projective plane</i>, and the distance
+    on it is not terribly important.
+</p>
+<h2>Quotients</h2>
+<p>
+    In math very broadly, one frequently encounters things called <i>quotients</i>.
+    If you have some mathematical structure \(S\) (maybe a topological space, a group,
+    a ring, a category, ...), you can construct a new structure \(T\) by taking
+    parts of \(S\) and deciding that those parts are "actually the same thing".
+</p>
+<p>
+    For example,
+    you can get a (topological) circle by taking the closed interval \([0,1]\) and deciding
+    that "actually, \(0=1\)", which essentially glues the ends of the interval
+    together. Something similar can be done in arithmetic — the <i>integers modulo \(n\)</i>
+    are what you get when you decide that \(n=0\) and keep the rest of arithmetic as it was. Arithmetic
+    with a clock usually takes place in the integers modulo 12 or 24.
+</p>
+<p>
+    In topology, quotients work like this: suppose we have a topological space \(X\), a set \(Y\)
+    and a surjective function \(f \colon X \to Y\). What we want to do is think of \(Y\) as the
+    space \(X\) with some points of \(X\) identified — specifically, we want the points \(x,x' \in X\)
+    to be equivalent precisely when \(f(x) = f(x')\).
+</p>
+<p>
+    Given this demand, there are many choices of topology for \(Y\) which make \(f\) a continuous
+    function. We could give \(Y\) the trivial topology, but this forgets all of the interesting
+    detail of \(X\) and makes \(Y\) into an uninteresting blob. Since we want to keep as many
+    of the distinctions that \(X\) makes as we can, we instead give \(Y\) the finest topology
+    we can <i>for which \(f\) is continuous</i>. With that topology, \(Y\) is called a quotient
+    space, a quotient of \(X\), and we say that \(f\) is a <i>projection</i>.
+</p>
+<p>
+    If you don't have a function \(f\) or a set \(Y\) to start with, but instead have an equivalence
+    relation \(\sim\) on \(X\), then you can define \(Y\) to be the set
+    \(\{S \subseteq X \mid \forall s, s' \in S. s \sim s'\}\), i.e. \(Y\) is the set
+    of equivalence classes for \(\sim\). Then you can define \(f(x) = \{x' \in X \mid x' \sim x\}\),
+    i.e. \(f\) sends each point to its equivalence class.
+</p>
+<p>
+    A classic example of a projection is the map \(\pi_{1} \colon \mathbb{R}^3 \to \mathbb{R}\)
+    which sends \((x,y,z)\) to \(x\). Similarly, you can get our previous example of the projective
+    plane by identifying opposite points on the 2-sphere.
+</p>
+<h2>Charts and atlases, differentiable manifolds</h2>
+<p>
+    When we have a manifold \(M\) and some open set \(O \subseteq M\), a homeomorphism
+    \(\phi \colon O \to \mathbb{R}^n\) is called a <i>chart</i>, in analogy with maps
+    of parts of the Earth, which ordinarily are genuine charts in the mathematical sense
+    when we think of the surface of the Earth as a manifold.
+</p>
+<p>
+    A collection of charts that covers all of a manifold (in the sense that the union of the domains
+    of the homeomorphisms is the entire manifold) is called an <i>atlas</i>, again
+    in analogy with collections of maps of the Earth. Given two overlapping charts
+    \(\phi_i \colon O_i \to \mathbb{R}^n\) and \(\phi_j \colon O_j \to \mathbb{R}^n\),
+    we can define the <i>transition function</i> \(\phi_{i,j} \colon \phi_i(O_i \cap O_j) \to \phi_j(O_i \cap O_j)\)
+    as \(\phi_{i,j} = \phi_j \circ \phi_i^{-1}\).
+</p>
+<p>
+    If all transition maps for a given atlas are differentiable as functions between subsets of \(\mathbb{R}^n\),
+    the atlas is called differentiable. If we got our manifold packaged with a differentiable atlas,
+    we call the manifold differentiable. Similarly, if all of the transition maps are smooth, then we say
+    we have a smooth manifold. Importantly, it's possible to do calculus on a differentiable manifold.
+    This is where <i>differential geometry</i> starts to play out.
+</p>
+<p>
+    If we start off with a manifold, there can be more than one way to give the manifold a smooth structure (atlas),
+    but that only starts happening in 4 dimensions and above. The justification for why it can't happen in 3 or fewer
+    dimensions is (reportedly) complex. The situation in 4 dimensions is complicated enough that we don't
+    know (as of mid-2024) whether the 4-sphere has exactly one smooth structure, some other finite number, or infinitely many.
+</p>
+<h2>Why manifolds?</h2>
+<p>
+    If my examples of manifolds so far have come from \(\mathbb{R}^n\) and its parts, why do we need this generalization?
+    It's mostly about <i>forgetting excess details</i>. If I want to study physical spacetime, even if I <i>can</i>
+    think of spacetime as sitting in some larger space, there will almost surely be many different ways to shove spacetime
+    into the larger space, and agreeing with other physicists about how to do this would be a pain. Better to focus
+    on what all such shovings would have in common, and that sort of info is reasonably well captured by treating
+    spacetime as an abstract manifold.
+</p>
+<h2>Things you can do with a differential structure on a manifold</h2>
+<p>
+    If you have a differentiable manifold \(M\) and a point \(x \in M\), you can look at \(x\) through
+    the lens of some chart \(\phi\). If you observe a particle traveling along \(M\) and it travels through
+    \(x\), then through the lens of \(\phi\) the particle will be traveling at some particular velocity,
+    which will just be a vector in \(\mathbb{R}^n\) attached to the point \(\phi(x)\).
+</p>
+<p>
+    The collection of all such velocity vectors forms a vector space in \(\mathbb{R}^n\) for a fixed
+    choice of \(\phi\), and this vector space is the <i>tangent space of \(M\) at the point \(x\)</i>,
+    written \(T_x M\), as viewed through \(\phi\). Clearly, since there are many choices of \(\phi\), this
+    is an extrinsic point of view, and the definition of \(T_x M\) isn't entirely clear for that reason:
+    how can we be sure that the behavior of this vector space doesn't depend in some crucial way on our
+    choice of \(\phi\)?
+</p>
+<p>
+    To mitigate that issue, we can construct the vector space \(T_x M\) as a quotient space:
+    its elements will be equivalence classes of pairs \((\phi, v)\), where \(\phi\) is
+    a chart of \(M\) around \(x\) and \(v\) is a vector in \(\mathbb{R}^n\). We will
+    say that \((\phi_i, v_i) \sim (\phi_j, v_j)\) when \(v_j = \phi_{i,j}'(\phi_i(x))v_i\),
+    keeping in mind here that \(\phi_{i,j}\) is just a function between subsets of \(\mathbb{R}^n\)
+    and its derivative at a point is a linear map, commonly identified with the Jacobian. We
+    can add equivalence classes of vectors by adding their representatives in a particular chart.
+    For this definition to make sense, it can't depend on the choice of representatives — that is
+    in fact the case, and it can be shown as a direct consequence of the linearity of \(\phi_{i,j}'\)
+    for general transition maps.
+</p>
+<p>
+    We can put all the tangent spaces into one big tangent space \(TM\), where a general
+    point will have the form \((x \colon M, v \colon T_{x} M)\), i.e. a tangent
+    vector \(v\) attached to \(M\) at the point \(x\). This is itself
+    a manifold, though it doesn't necessarily get a differential structure from \(M\).
+    That said, if \(M\) has a smooth structure, so will \(TM\).
+</p>
+<p>
+    It's also possible to think of a tangent vector at \(x \colon M\) as an equivalence
+    class of curves \(\gamma \colon (-1,1) \to M\) for which \(\gamma(0) = x\). Two
+    curves are considered to belong to the same equivalence class when they have the same
+    velocity at \(x\) in the view of every chart around \(x\).
+</p>
+<p>
+    If we have a continuous function \(f \colon M \to N\) between differentiable manifolds
+    \(M,N\), then we call \(f\) differentiable at the point \(x \colon M\) if
+    for every chart \(\phi \colon U \to \mathbb{R}^m\) around \(x\) and every chart
+    \(\psi \colon V \to \mathbb{R}^n\) around \(f(x)\),
+    the function \(\psi \circ f \circ \phi^{-1} \colon \phi(U \cap f^{-1}(V)) \to \mathbb{R}^n\) is
+    differentiable as a function from an open set of \(\mathbb{R}^m\) to \(\mathbb{R}^n\). We
+    call \(f\) a differentiable function if it's differentiable at every point of \(M\).
+</p>
+<p>
+    For a differentiable function \(f \colon M \to N\), we can define its differential
+    \(df \colon TM \to TN\) by thinking of points in \(TM\) as pairs \((x,\gamma)\)
+    where \(\gamma\) is a curve passing through \(x\), and sending this pair to
+    \((f(x), f \circ \gamma)\). This respects the equivalence relation on curves which
+    groups them by velocity through \(x\).
+</p>
+<p>
+    There's an important thing to note about how this definition is not exactly a generalization
+    of the differential from multivariable calculus: multivariable calculus takes heavy (and often excessive)
+    advantage of the fact that the tangent spaces \(T_x \mathbb{R}^n\) are interchangeable: in \(\mathbb{R}^n\),
+    we can translate a whole curve passing through \(x\) to one passing through \(y\) in one canonical way,
+    and this gives us a standard way to identify velocities through \(x\) with velocities through \(y\).
+</p>
+<p>
+    For that reason, multivariable calculus usually "collapses" \(T\mathbb{R}^n\) to \(T_0 \mathbb{R}^n\),
+    which is isomorphic to \(\mathbb{R}^n\) in a canonical way, so it just gets treated as \(\mathbb{R}^n\).
+</p>
+<h2>Interlude: tensors</h2>
+<p>
+    It's conventional wisdom that computer scientists, mathematicians and physicists each have a different
+    definition for "tensor". As I understand it, when a physicist says "tensor", a mathematician
+    would say "tensor field" when speaking precisely. The computer scientist's definition may be safely
+    ignored in this text.
+</p>
+<p>
+    Tensors provide a way to "take products" of vectors in a vector space, or sometimes products
+    of vectors in different vector spaces. The idea is that something like the algebraic
+    calculation \((a\vb{i}+b\vb{j})(c\vb{i}+d\vb{j}) = ac\vb{i}\vb{i} + ad \vb{i}\vb{j} + bc \vb{j}\vb{i} + bd \vb{j}\vb{j}\)
+    should make sense, where \(a,b,c,d\) are real numbers and \(\bf{i},\bf{j}\) are vectors. You'll notice
+    that this calculation leaves the products of \(\vb{i}, \vb{j}\) uninterpreted — this is by design.
+    The product of two vectors is ultimately supposed to be a new kind of object, not identified with a number
+    or an existing vector, and we introduce them to aid us with algebra. This is in sharp contrast
+    to something like the complex numbers or the quaternions where
+    the product of two vectors is supposed to reduce to something already familiar.
+</p>
+<p>
+    The story goes like this: if we have vector spaces \(V, W\), the <i>tensor product</i>
+    of \(V\) and \(W\), annotated \(V \otimes W\), is a vector space constructed as the
+    quotient \(F(V \times W)/\sim\), where \(F(V \times W)\) is the <i>free vector space</i>
+    on the set \(V \times W\), and \(\sim\) is an equivalence relation that captures the algebra
+    we want the tensor product to satisfy, namely bilinearity.
+</p>
+<p>
+    Now, what does all that mean?
+</p>
+<p>
+    First, the free vector space \(F(S)\) on a set \(S\) (over the field \(\mathbb{K}\)) is the vector
+    space of all functions of type \(S \to \mathbb{K}\) which are nonzero on a finite subset of the domain.
+    You can interpret \(F(S)\) as being a vector space that has \(S\) as its basis. 
+</p>
+<p>
+    When we take \(F(V \times W)\), we are sort of treating \(V \times W\) as a black box — the
+    vector space structure of \(F(V \times W)\) has no idea where the basis elements came from
+    or what other structure they have, all that really matters is how many of them there were.
+</p>
+<p>
+    Even in the modest case of \(F(\mathbb{R})\), \(F(\mathbb{R})\) is a vector space with uncountably
+    infinite dimension, since its basis is \(\mathbb{R}\), which is an uncountably infinite set.
+</p>
+<p>
+    The gargantuan size of \(F(V \times W)\) gets cut down significantly once we introduce the equivalence
+    relation \(\sim\) for our quotient. Because we want \(\sim\) to enforce our rules of algebra,
+    we construct \(\sim\) as the smallest (or finest) equivalence relation that satisfies the following
+    for all choices of \(v,v' \in V; w,w' \in W; \lambda \in \mathbb{K}\) (and also respects the vector
+    space structure on \(F(V \times W)\)):
+    <ol>
+        <li>\((\lambda v+v', w) \sim \lambda (v,w) + (v',w)\),</li>
+        <li>\((v,\lambda w+w') \sim \lambda (v,w) + (v,w')\).</li>
+    </ol>
+    The first condition expresses that the tensor product (as a function from the product set
+    \(V \times W\) to \(V \otimes W\)) becomes a linear function in the left
+    input when the right input is fixed, and the second expresses the same swapping right and left.
+    These two conditions together express that the product is <i>bilinear</i>.
+</p>
+<p>
+    Using this, we can already start performing calculations. Let's show that \(\mathbb{R}^2 \otimes \mathbb{R}^2\)
+    is at most 4-dimensional.
+
+    \[\sum_{i=1}^k \lambda_i (v_i, w_i) = \sum_{i=1}^k \lambda_i (a_i \vb{i} + b_i \vb{j}, c_i \vb{i} + d_i \vb{j})
+    = \sum_{i=1}^k \lambda_i (a_i (\vb{i}, c_i \vb{i} + d_i \vb{j}) + b_i (\vb{j}, c_i \vb{i} + d_i \vb{j}))
+    = \sum_{i=1}^k \lambda_i (a_i c_i (\vb{i},\vb{i}) + a_i d_i (\vb{i}, \vb{j}) + b_i c_i (\vb{j}, \vb{i}), + b_i d_i (\vb{j}, \vb{j})) \]
+
+    It's clear that this last sum is a linear combination of the vectors \((\vb{i},\vb{i}), (\vb{i}, \vb{j}), (\vb{j}, \vb{i}), (\vb{j}, \vb{j})\).
+    Showing that \(\mathbb{R}^2 \otimes \mathbb{R}^2\) is exactly 4-dimensional is a bit more work, and we won't undertake it here. 
+</p>
+<h2>Comparing velocities via connections</h2>
+<p>
+    On a generic differentiable manifold, there's no single way to compare velocities through a point \(x\)
+    with velocities through a point \(y\): the results of your comparisons will generally depend on your choices
+    of charts at \(x\) and \(y\). Nevertheless, while it's possible to perform comparisons in more than one way,
+    it's possible to choose a consistent standard of comparison for the whole space, and this is called
+    a <i>connection</i>.
+</p>
+<p>
+    As mentioned above, multivariable calculus collapses \(T\mathbb{R}^n\) to \(T_0 \mathbb{R}^n\), and one
+    way of interpreting this is that this works because \(\mathbb{R}^n\) comes "prepackaged" with a connection.
+</p>
+</body>
+</html>
