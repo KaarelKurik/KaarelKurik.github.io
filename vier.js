@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import vibrantUrl from './images/vibrant-gradient.webp'
 
 class SceneElement extends HTMLElement {
     static observedAttributes = ["angle", "length"];
@@ -20,7 +21,7 @@ class SceneElement extends HTMLElement {
         this.ellipse_line = new THREE.Line(ellipse_geometry, ellipse_material);
 
 
-        const texture = new THREE.TextureLoader().load('images/vibrant-gradient.webp', (d)=>{this.render()});
+        const texture = new THREE.TextureLoader().load(vibrantUrl, (d)=>{this.render()});
         const plane_material = new THREE.MeshBasicMaterial({map:texture});
         const plane_geom = new THREE.PlaneGeometry(1, 1);
         this.plane = new THREE.Mesh(plane_geom, plane_material);
