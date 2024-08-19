@@ -34,9 +34,6 @@ class SceneElement extends HTMLElement {
         ellipse_line.add(tangent_arrow);
         scene.add(ellipse_line);
 
-        const texture = new THREE.TextureLoader().load('images/Konata.webp', (d)=>{this.render()}, (e)=>{}, (err)=>{console.log(err)});
-        console.log(texture);
-
         scene.add(this.plane.clone());
 
         const renderer = new THREE.WebGLRenderer();
