@@ -1,5 +1,181 @@
 import * as THREE from 'three';
 import vibrantUrl from './images/vibrant-gradient.webp'
+import {regconst, regeval} from './absurdity'
+import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+import handUrl from './models/checkered_hand.glb?url'
+
+function wrap_constructor(c) {
+    return (...a) => {return new c(...a)} 
+}
+
+function invert_vector(radius, v) {
+    let l = (radius*radius)/v.lengthSq();
+    return v.multiplyScalar(l);
+}
+
+function invert_mesh(radius, ref, target) {
+    let tpos = target.geometry.attributes.position;
+    let rpos = ref.geometry.attributes.position;
+    let global_from_local = ref.matrixWorld;
+    let cvec = new THREE.Vector3();
+    for (let i = 0; i < tpos.count; ++i) {
+        cvec.fromBufferAttribute(rpos, i);
+        cvec.applyMatrix4(global_from_local);
+        const global_inverse = invert_vector(radius, cvec);
+        tpos.setXYZ(i, ...global_inverse)
+    }
+    tpos.needsUpdate = true;
+}
+
+class GlueElement extends HTMLElement {
+    static observedAttributes = ["distance"]
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        const loader = new GLTFLoader();
+        // handle this better
+        let selfref = this;
+        
+        this.distanceNum = new regeval(wrap_constructor(Number), this.distance);
+        const displacement = new regeval(wrap_constructor(THREE.Vector3), this.distanceNum)
+
+        const scene = new THREE.Scene();
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+        this.renderer_element = this.appendChild(renderer.domElement);
+
+        const scene_2 = new THREE.Scene();
+        const renderer_2 = new THREE.WebGLRenderer();
+        renderer_2.setSize(window.innerWidth/2, window.innerHeight/2);
+        this.renderer_element_2 = this.appendChild(renderer_2.domElement);
+
+        const hemilight = new THREE.HemisphereLight();
+        scene.add(hemilight);
+
+        const hemilight2 = new THREE.HemisphereLight();
+        scene_2.add(hemilight2);
+
+        const mat =  new THREE.MeshStandardMaterial({color: 0xffffff, wireframe: true});
+
+        const inversion_radius = 1;
+
+        const sphere_geom = new THREE.SphereGeometry(inversion_radius);
+        const sphere = new THREE.Mesh(sphere_geom, mat)
+        scene.add(sphere)
+
+        scene_2.add(sphere.clone())
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 500);
+        const controls = new OrbitControls(camera, this.renderer_element);
+        const controls2 = new OrbitControls(camera, this.renderer_element_2);
+        controls.addEventListener("change", (e) => {
+            renderer.render(scene, camera)
+            renderer_2.render(scene_2, camera)
+        });
+        controls2.addEventListener("change", (e) => {
+            renderer.render(scene, camera)
+            renderer_2.render(scene_2, camera)
+        });
+        camera.position.set(0,0,4);
+        camera.lookAt(0,0,0);
+
+
+        loader.load(handUrl, (gltf) => {
+            selfref.model = gltf.scene.children[0]
+
+            scene.add(selfref.model)
+            selfref.model.rotateOnWorldAxis(new THREE.Vector3(0,0,1), -Math.PI/2);
+
+
+            selfref.model2 = new THREE.Mesh(selfref.model.geometry.clone(), selfref.model.material.clone());
+            scene_2.add(selfref.model2)
+            console.log(selfref.model)
+            invert_mesh(inversion_radius, selfref.model, selfref.model2)
+            console.log(selfref.model2)
+
+
+            selfref.model_displacer = new regeval((displacement)=>{
+                selfref.model.position.copy(displacement)
+                invert_mesh(inversion_radius, selfref.model, selfref.model2)
+            }, displacement)
+            renderer.render(scene, camera)
+            renderer_2.render(scene_2, camera)
+        }, undefined, (err) => {
+            console.log("WHOOPS")
+            console.log(err)
+        })
+        console.log("got past")
+
+        this.scene_updater = new regeval((displacement) => {
+            renderer.render(scene, camera)
+            renderer_2.render(scene_2, camera)
+        }, displacement);
+
+        renderer.render(scene, camera)
+        renderer_2.render(scene_2, camera)
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (!(name in this)) {
+            this[name] = new regconst(newValue)
+        } else {
+            this[name].set_value(newValue)
+        }
+    }
+}
+customElements.define('glue-scene', GlueElement);
+
+class AlternateElement extends HTMLElement {
+    static observedAttributes = ["radiusx", "radiusy"];
+    constructor() {
+        super();
+    }
+    connectedCallback() {
+        this.radiusXnum = new regeval(wrap_constructor(Number), this.radiusx)
+        this.radiusYnum = new regeval(wrap_constructor(Number), this.radiusy)
+        const zeroc = new regconst(0);
+
+        this.ellipse = new regeval(wrap_constructor(THREE.EllipseCurve), zeroc, zeroc, this.radiusXnum, this.radiusYnum);
+        const Npoints = new regconst(64);
+        const ellipse_points = new regeval((ellipse, n) => {
+            return ellipse.getPoints(n)
+        }, this.ellipse, Npoints);
+        const ellipse_backing_buffer = new THREE.BufferGeometry();
+        const ellipse_geometry = new regeval((ep) => {
+            ellipse_backing_buffer.setFromPoints(ep);
+            return ellipse_backing_buffer;
+        }, ellipse_points);
+        const ellipse_material = new regconst(new THREE.LineBasicMaterial({color: 0xffffff}));
+        this.ellipse_line = new regeval(wrap_constructor(THREE.Line), ellipse_geometry, ellipse_material);
+
+        this.scene = new THREE.Scene();
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setSize(window.innerWidth/2, window.innerHeight/2);
+        this.renderer_element = this.appendChild(this.renderer.domElement);
+
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 500);
+        const controls = new OrbitControls(camera, this.renderer_element);
+        controls.addEventListener("change", (e) => {this.renderer.render(this.scene, camera)});
+        camera.position.set(0,0,5);
+        camera.lookAt(0,0,0);
+
+        this.scene.add(this.ellipse_line.value);
+
+        this.scene_updater = new regeval((ellipse_line)=>{
+            this.renderer.render(this.scene, camera)
+        }, this.ellipse_line)
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+        if (!(name in this)) {
+            this[name] = new regconst(newValue)
+        } else {
+            this[name].set_value(newValue)
+        }
+    }
+}
+customElements.define('ellipse-scene', AlternateElement);
 
 class SceneElement extends HTMLElement {
     static observedAttributes = ["angle", "length"];
@@ -123,57 +299,3 @@ class SceneElement extends HTMLElement {
     }
 }
 customElements.define("cube-scene", SceneElement);
-
-class GlueScene extends HTMLElement {
-
-}
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 500 );
-camera.position.set( 0, 0, 5 );
-camera.lookAt(0,0,0);
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth/2, window.innerHeight/2);
-document.body.appendChild( renderer.domElement );
-
-
-const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-const cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
-
-const curve = new THREE.EllipseCurve(
-    0, 0, 1, 1
-);
-const points = curve.getPoints(50);
-const circle_geometry = new THREE.BufferGeometry().setFromPoints(points);
-const circle_material = new THREE.LineBasicMaterial({color: 0xff0000});
-const ellipse = new THREE.Line(circle_geometry, circle_material);
-scene.add(ellipse);
-
-let t = 0;
-
-function animate() {
-    t += 0.002;
-    t = t % 1;
-    let tangent_base_2d = curve.getPoint(t);
-    let tangent_base = new THREE.Vector3(tangent_base_2d.x, tangent_base_2d.y, 0.0);
-    let tangent_2d = curve.getTangent(t);
-    let tangent = new THREE.Vector3(tangent_2d.x, tangent_2d.y, 0);
-    let arrow_helper = new THREE.ArrowHelper(tangent, tangent_base, 1, 0x00ff00);
-    scene.add(arrow_helper);
-    renderer.render(scene, camera);
-    scene.remove(arrow_helper);
-}
-
-
-// camera.position.z = 5;
-
-// function animate() {
-//     cube.rotation.x += 0.01;
-//     cube.rotation.y += 0.01;
-// 	renderer.render( scene, camera );
-// }
-renderer.setAnimationLoop( animate );
-renderer.render(scene, camera);
