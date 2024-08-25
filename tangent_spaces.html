@@ -3,11 +3,16 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Tangent spaces</title>
-		<script type="module" crossorigin src="/assets/tangent_spaces-DV8cx0hR.js"></script>
+		<script type="module" crossorigin src="/assets/tangent_spaces-BERR_W8A.js"></script>
 	</head>
 	<body>
 		<cube-scene id="cube-scene" angle="0.0" length="1.0"></cube-scene>
 		<input oninput="{document.getElementById('cube-scene').setAttribute('angle', this.value)}" type="range" min="0.0" max="6.28" value="0" step="any"/>
 		<input type="range" oninput="{document.getElementById('cube-scene').setAttribute('length', this.value)}" min="-3.0" max="3.0" value="1" step="any"/>
+		<ellipse-scene id="ellipse-scene" radiusx="1.0" radiusy="1.0"></ellipse-scene>
+		<input type="range" name="radiusx" oninput="{document.getElementById('ellipse-scene').setAttribute('radiusx', this.value)}" min="0.0" max="4.0" value="1" step="any">
+		<input type="range" name="radiusy" oninput="{document.getElementById('ellipse-scene').setAttribute('radiusy', this.value)}" min="0.0" max="4.0" value="1" step="any">
+		<glue-scene id="glue-scene" distance="0"></glue-scene>
+		<input style="width: 50%;" type="range" oninput="{document.getElementById('glue-scene').setAttribute('distance', this.value)}" min="-4.0" max="4.0" value="0" step="any">
 	</body>
 </html>
