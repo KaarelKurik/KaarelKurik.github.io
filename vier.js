@@ -57,15 +57,41 @@ class GlueElement extends HTMLElement {
         const hemilight2 = new THREE.HemisphereLight();
         scene_2.add(hemilight2);
 
-        const mat =  new THREE.MeshStandardMaterial({color: 0xffffff, wireframe: true});
+        // const mat =  new THREE.MeshStandardMaterial({color: 0xffffff, wireframe: true});
+        const sphere_mat = new THREE.MeshNormalMaterial({wireframe: true, opacity: 0.5, transparent: true});
+        const equator_mat_red = new THREE.LineBasicMaterial({color: 0xff0000});
+        const equator_mat_green = new THREE.LineBasicMaterial({color: 0x00ff00});
 
-        const inversion_radius = 1;
+        const inversion_radius = 2.8;
+        const inner_radius = 2;
+        const outer_radius = inversion_radius*inversion_radius/inner_radius;
 
-        const sphere_geom = new THREE.SphereGeometry(inversion_radius);
-        const sphere = new THREE.Mesh(sphere_geom, mat)
-        scene.add(sphere)
+        const sphere_geom = new THREE.SphereGeometry(1);
+        const sphere = new THREE.Mesh(sphere_geom, sphere_mat)
 
-        scene_2.add(sphere.clone())
+        const ellipse_geom = new THREE.BufferGeometry().setFromPoints(new THREE.EllipseCurve(0,0,1,1).getPoints(64));
+        ellipse_geom.rotateX(Math.PI/4);
+
+        const inner_sphere_1 = sphere.clone();
+        const inner_equator_1 = new THREE.Line(ellipse_geom, equator_mat_red);
+        inner_sphere_1.add(inner_equator_1);
+        inner_sphere_1.scale.setScalar(inner_radius);
+
+        const outer_sphere_1 = sphere.clone();
+        const outer_equator_1 = new THREE.Line(ellipse_geom, equator_mat_green);
+        outer_sphere_1.add(outer_equator_1);
+        outer_sphere_1.scale.setScalar(outer_radius);
+
+        const inner_sphere_2 = outer_sphere_1.clone();
+        inner_sphere_2.scale.setScalar(inner_radius);
+        const outer_sphere_2 = inner_sphere_1.clone();
+        outer_sphere_2.scale.setScalar(outer_radius);
+
+        scene.add(inner_sphere_1);
+        scene.add(outer_sphere_1);
+
+        scene_2.add(inner_sphere_2);
+        scene_2.add(outer_sphere_2);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 500);
         const controls = new OrbitControls(camera, this.renderer_element);

@@ -13,6 +13,8 @@
 		<input type="range" name="radiusx" oninput="{document.getElementById('ellipse-scene').setAttribute('radiusx', this.value)}" min="0.0" max="4.0" value="1" step="any">
 		<input type="range" name="radiusy" oninput="{document.getElementById('ellipse-scene').setAttribute('radiusy', this.value)}" min="0.0" max="4.0" value="1" step="any">
 		<glue-scene id="glue-scene" distance="0"></glue-scene>
-		<input style="width: 50%;" type="range" oninput="{document.getElementById('glue-scene').setAttribute('distance', this.value)}" min="-4.0" max="4.0" value="0" step="any">
+		<input style="width: 50%;" type="range" oninput="{
+				console.log('oninput slider')
+				document.getElementById('glue-scene').setAttribute('distance', this.value)}" min="-4.0" max="4.0" value="0" step="any">
 	</body>
 </html>

@@ -6,7 +6,8 @@
 	},
 	"scripts": {
 		"build": "pnpx vite build",
-		"deploy": "pnpm run build && pnpx gh-pages -d dist"
+		"deploy": "pnpm run build && pnpx gh-pages -d dist",
+		"dev": "pnpx vite dev"
 	},
 	"devDependencies": {
 		"gh-pages": "^6.1.1"
